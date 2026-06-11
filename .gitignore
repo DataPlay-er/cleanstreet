@@ -30,6 +30,9 @@ pip-delete-this-directory.txt
 venv/
 ENV/
 env/
+*venv/
+authvenv/
+*/authvenv/
 
 # Django
 *.log
@@ -71,10 +74,15 @@ build/
 .env.*.local
 .env.development
 .env.production
+# But DO commit .env.example and docker-compose.example.yml
+!.env.example
+!docker-compose.example.yml
 
 # Docker
 *.log
 .docker/
+docker-compose.yml
+!docker-compose.example.yml
 
 # Coverage reports
 htmlcov/
