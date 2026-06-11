@@ -20,6 +20,7 @@ from app.models import UserRole, UserStatus
 # password validation:
 
 def validate_password(password: str) -> str:
+    errors: list[str] = []
     if len(password) < settings.password_min_length:
         raise ValueError(f"Password must be at least {settings.password_min_length} characters long.")
     if settings.password_require_uppercase and not re.search(r"[A-Z]", password):
@@ -30,7 +31,7 @@ def validate_password(password: str) -> str:
         raise ValueError("Password must contain at least one digit.")
     if settings.password_require_special and not re.search(r"[!@#$%^&*()-+]", password):
         raise ValueError("Password must contain at least one special character.")
-    if not re.search(r"\s", password):
+    if re.search(r"\s", password):
         raise ValueError("Password must not contain whitespace.")
     if errors:
         raise ValueError(f"Password must contain: {', '.join(errors)}.")
@@ -50,7 +51,10 @@ class UserCreate(BaseModel):
     def validate_username(cls, v: str) -> str:
         if not v or len(v) < 3 or len(v) > 100:
             raise ValueError("Username too short or too long.")
-        return v
+        # Username must be alphanumeric plus @ and . for email-like usernames !!!(any other characters aside of letters are optional, so to lookk back at this condition)
+        if not all(c.isalnum() or c in '@.' for c in v):
+            raise ValueError("Username contains invalid characters.")
+        return v.lower()
 
     @field_validator("password")
     @classmethod
@@ -85,7 +89,7 @@ class LoginRequest(BaseModel):
     def validate_username(cls, v: str) -> str:
         if not v or len(v) < 3 or len(v) > 100:
             raise ValueError("Username too short or too long.")
-        return v
+        return v.lower()
 
 # ── Response Models ────────────────────────────────────────────────────────────── #
 # These define the shape of data sent back to the client. They can be used in FastAPI route decorators to automatically generate OpenAPI docs.
@@ -118,5 +122,6 @@ class TokenPayload(BaseModel):
     role: UserRole
     type: str                         # "access" or "refresh"
 
-class ErrorResponse(BaseModel):
+class MessageResponse(BaseModel):
+    # A simple response model for endpoints that just return a message (e.g., logout confirmation).
     message: str    

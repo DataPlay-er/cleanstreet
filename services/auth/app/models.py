@@ -10,11 +10,12 @@ from typing import Optional
 
 class UserRole(str, Enum):
     admin = "admin"
-    user = "user"
+    operator = "operator"
 
 class UserStatus(str, Enum):
     active = "active"
-    inactive = "inactive"
+    suspended = "suspended"
+    # TO ADD IN FUTURE: inactive = "inactive"  # For soft-deleted accounts or those pending reactivation
 
 class User(SQLModel, table=True):
     __tablename__ = "users"
@@ -22,7 +23,7 @@ class User(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     username: str = Field(index=True, unique=True, nullable=False, max_length=100)
     hashed_password: str = Field(max_length=128, nullable=False)
-    role: UserRole = Field(default=UserRole.user, nullable=False)
+    role: UserRole = Field(default=UserRole.operator, nullable=False)
     status: UserStatus = Field(default=UserStatus.active, nullable=False)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), nullable=False)
