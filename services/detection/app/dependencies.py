@@ -1,0 +1,1 @@
+# get_detector dependency (singleton pattern)

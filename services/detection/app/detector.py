@@ -1,0 +1,1 @@
+# The Detector class — YOLO + ArcFace + pgvector + Redis
